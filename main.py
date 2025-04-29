@@ -1,0 +1,803 @@
+import sqlite3
+import sys
+
+from PyQt5 import QtCore
+
+from PIL import Image
+from PyQt5 import uic
+from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QLabel, QFileDialog, QMessageBox
+
+PASSWORD_SYMBOLS = "!%@#$^&*"
+ENG = "qwertyuiopasdfghjklzxcvbnm"
+NUM = "1234567890"
+
+
+class Vxodtyt(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.con = sqlite3.connect("users.sqlite")
+        self.setStyleSheet("#Log_window{background-image: url('sup/back4.jpg'); no-repeat;}")
+        self.cur = self.con.cursor()
+        with self.con:
+            self.cur.execute('''
+               CREATE TABLE IF NOT EXISTS pass (
+               id       INTEGER PRIMARY KEY AUTOINCREMENT,
+               name     TEXT,
+               password TEXT
+               );
+            ''')
+        self.con.close()
+        self.main()
+
+    def main(self):
+        uic.loadUi("ui/enter.ui", self)
+        self.setWindowTitle("ChessTraining")
+        self.setWindowIcon(QIcon('sup/logo.png'))
+        self.entmegabtn.clicked.connect(self.wave)
+        self.regbtn.clicked.connect(self.register)
+
+    def wave(self):
+        self.con = sqlite3.connect("users.sqlite")
+        self.cur = self.con.cursor()
+        self.user_login = self.login.text()
+        self.user_password = self.password.text()
+        self.cur.execute('SELECT * FROM pass WHERE name = ? AND password = ?', (self.user_login, self.user_password))
+        if self.cur.fetchone() != None:
+            val = self.get_val()
+            if val == 1:
+                self.studyyy = TeacherChooseMenu()
+                self.studyyy.show()
+                self.con.commit()
+                self.hide()
+            elif val == 0:
+                self.study = Choosemenu()
+                self.study.show()
+                self.con.commit()
+                self.hide()
+            self.con.close()
+        else:
+            self.lab.setText("Имя пользователя или пароль неверные")
+
+    def get_val(self):
+        self.con = sqlite3.connect("users.sqlite")
+        self.cur = self.con.cursor()
+        self.cur.execute('SELECT val FROM pass WHERE name = ? AND password = ?', (self.user_login, self.user_password))
+        val = self.cur.fetchone()[0]
+        return val
+
+    def register(self):
+        uic.loadUi("ui/t2.ui", self)
+        self.setWindowTitle("ChessTraining")
+        self.setWindowIcon(QIcon('sup/logo.png'))
+        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.asteach.clicked.connect(self.reguser)
+        self.asuser.clicked.connect(self.reguser)
+        self.commandLinkButton2.clicked.connect(self.back)
+
+    def back(self):
+        sen = self.sender()
+        if sen.objectName() == "commandLinkButton2":
+            self.main()
+        if sen.objectName() == "commandLinkButton3":
+            self.register()
+
+    def reguser(self):
+        send = self.sender()
+        if send.text() == "Как ученик":
+            self.flag = 0
+        elif send.text() == "Как учитель":
+            self.flag = 1
+        uic.loadUi("ui/t3.ui", self)
+        self.setWindowTitle("ChessTraining")
+        self.setWindowIcon(QIcon('sup/logo.png'))
+        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.registerbtn.clicked.connect(self.prov)
+        self.commandLinkButton3.clicked.connect(self.back)
+
+
+    def prov(self):
+        self.con = sqlite3.connect("users.sqlite")
+        self.cur = self.con.cursor()
+        flag1, flag2, flags, flagup, flagdo, n = False,  False,  False,  False,  False, False
+        self.login_reg = self.loginreg.text()
+        self.password_reg = self.passreg.text()
+        self.cur.execute('SELECT name FROM pass WHERE name = ?', (self.login_reg,))
+        if not self.cur.fetchone():
+            flag1 = True
+        else:
+            self.labeler.setText("Такой пользователь уже есть")
+        if 7 < len(self.password_reg) < 17:
+            flag2 = True
+        for i in self.password_reg:
+            if i in PASSWORD_SYMBOLS:
+                flags = True
+            elif i in NUM:
+                n = True
+            elif i == i.upper():
+                flagup = True
+            elif i == i.lower():
+                flagdo = True
+        if flagup and flags and flag2 and flag1 and flagdo and n:
+            self.cur.execute("INSERT INTO 'pass' (name, password, val) VALUES (?, ?, ?)", (self.login_reg, self.password_reg, self.flag))
+            self.con.commit()
+            self.con.close()
+            self.main()
+        elif not flag2 or not flagup or not flagdo or not flags:
+            self.labeler.setText("Пароль не соответствует критериям")
+
+
+class Choosemenu(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.studymain()
+
+    def studymain(self):
+        uic.loadUi("ui/mainchoose.ui", self)
+        self.setWindowTitle("ChessTraining")
+        self.setWindowIcon(QIcon('sup/logo.png'))
+        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.commandLinkButton.clicked.connect(self.back)
+        self.ychebniyplan.clicked.connect(self.LES)
+        self.spravka.clicked.connect(self.SPR)
+
+    def SPR(self):
+        self.SPRA = Sprav()
+        self.SPRA.show()
+        self.hide()
+
+    def LES(self):
+        self.LESIK = Lessonsst()
+        self.LESIK.show()
+        self.hide()
+
+
+    def back(self):
+        self.backvxodtyt = Vxodtyt()
+        self.backvxodtyt.show()
+        self.hide()
+
+
+class TeacherChooseMenu(Choosemenu):
+    def __init__(self):
+        super().__init__()
+        self.studymain()
+
+    def studymain(self):
+        uic.loadUi("ui/teachmainchoose.ui", self)
+        self.setWindowTitle("ChessTraining")
+        self.setWindowIcon(QIcon('sup/logo.png'))
+        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.ychebniyplant.clicked.connect(self.LES)
+        self.spravkat.clicked.connect(self.SPR)
+        self.teacherbtn.clicked.connect(self.teacher)
+        self.commandLinkButton.clicked.connect(self.back)
+
+    def teacher(self):
+        self.t = Teach()
+        self.t.show()
+        self.hide()
+
+
+class Teach(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.mane()
+
+    def mane(self):
+        uic.loadUi('ui/lessons_plans.ui', self)
+        self.setWindowTitle("ChessTraining")
+        self.setWindowIcon(QIcon('sup/logo.png'))
+        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.addbtn.clicked.connect(self.addi)
+        self.commandLinkButton.clicked.connect(self.back)
+        self.con = sqlite3.connect("users.sqlite")
+        self.cur = self.con.cursor()
+        self.poiskbut.clicked.connect(self.update_result)
+        self.openbtn.clicked.connect(self.open_less)
+        self.modified = {}
+        self.titles = None
+        self.delbtn.clicked.connect(self.delete_elem)
+
+    def delete_elem(self):
+        rows = list(set([i.row() for i in self.tableWidget.selectedItems()]))
+        ids = [self.tableWidget.item(i, 0).text() for i in rows]
+        valid = QMessageBox.question(
+            self, '', "Действительно удалить элементы с id " + ",".join(ids),
+            QMessageBox.Yes, QMessageBox.No)
+        if valid == QMessageBox.Yes:
+            self.cur.execute("DELETE FROM study_plans WHERE name = ?", (self.tableWidget.currentItem().text(), ))
+            self.con.commit()
+
+    def keyPressEvent(self, event):
+        if event.key() == 16777220:
+            self.open_less()
+
+    def open_less(self):
+        title = self.tableWidget.currentItem().text()
+        self.viewR = ViewLesson(title)
+        self.viewR.show()
+        self.le = Lessonsst()
+        self.le.hide()
+
+    def update_result(self):
+        self.wenty = self.lessline.text()
+        if self.wenty and self.diff.currentText() != "Выберите...":
+            result = self.cur.execute("SELECT name FROM study_plans WHERE namelc LIKE ? AND diff = ?",
+                                      (self.wenty.lower() + "%", self.diff.currentText(),)).fetchall()
+        elif self.wenty and self.diff.currentText() == "Выберите...":
+            result = self.cur.execute("SELECT name FROM study_plans WHERE namelc LIKE ?",
+                                      (self.wenty.lower() + "%",)).fetchall()
+        elif not self.wenty and self.diff.currentText() != "Выберите...":
+            result = self.cur.execute("SELECT name FROM study_plans WHERE diff = ?",
+                                      (self.diff.currentText(),)).fetchall()
+        else:
+            result = self.cur.execute("SELECT name FROM study_plans").fetchall()
+        self.tableWidget.setRowCount(len(result))
+        self.tableWidget.setColumnCount(len(result[0]))
+        self.titles = [description[0] for description in self.cur.description]
+        for i, elem in enumerate(result):
+            for j, val in enumerate(elem):
+                self.tableWidget.setItem(i, j, QTableWidgetItem(str(val)))
+        self.modified = {}
+
+    def back(self):
+        self.t = TeacherChooseMenu()
+        self.t.show()
+        self.hide()
+
+    def addi(self):
+        self.addw = AddLess()
+        self.addw.show()
+        self.addl = Teach()
+        self.addl.hide()
+
+
+class AddLess(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.img1, self.img2, self.img3, self.img4, self.img5 = 0, 0, 0, 0, 0
+        self.mane()
+
+
+    def mane(self):
+        uic.loadUi('ui/addless.ui', self)
+        self.lab.hide()
+        self.setWindowTitle("ChessTraining")
+        self.setWindowIcon(QIcon('sup/logo.png'))
+        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.con = sqlite3.connect("users.sqlite")
+        self.cur = self.con.cursor()
+        self.addbtn.clicked.connect(self.save)
+        self.commandLinkButton1.clicked.connect(self.op)
+        self.commandLinkButton2.clicked.connect(self.op)
+        self.commandLinkButton3.clicked.connect(self.op)
+        self.commandLinkButton4.clicked.connect(self.op)
+        self.commandLinkButton5.clicked.connect(self.op)
+        self.commandLinkButton.clicked.connect(self.back)
+
+    def back(self):
+        self.hide()
+
+    def op(self):
+        sen = self.sender()
+        if sen.text()[-1] == "1":
+            self.img1 = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0].split("/")[-1]
+        if sen.text()[-1] == "2":
+            self.img2 = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0].split("/")[-1]
+        if sen.text()[-1] == "3":
+            self.img3 = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0].split("/")[-1]
+        if sen.text()[-1] == "4":
+            self.img4 = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0].split("/")[-1]
+        if sen.text()[-1] == "5":
+            self.img5 = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0].split("/")[-1]
+
+    def save(self):
+        flag1, flag2, flag3, flag4 = True, True, True, True
+        self.x1, self.x2, self.x3, self.x4, self.x5 = self.xod1.toPlainText(), self.xod2.toPlainText(), \
+            self.xod3.toPlainText(), self.xod4.toPlainText(), self.xod5.toPlainText()
+        self.lab.clear()
+        if self.x1 and self.x2 and self.x3 and self.x4 and self.x5:
+            pass
+        else:
+            self.lab.setText('Вы не заполнили урок до конца: не все ходы были записаны')
+            self.lab.show()
+            flag1 = False
+        if self.img1 and self.img2 and self.img3 and self.img4 and self.img5:
+            pass
+        else:
+            self.lab.show()
+            self.lab.setText('Вы не заполнили урок до конца: не все фотографии были загружены')
+            flag2 = False
+        if self.name.text():
+            pass
+        else:
+            self.lab.show()
+            self.lab.setText('Вы не заполнили урок до конца: имя урока не указано')
+            flag3 = False
+        if self.info.toPlainText():
+            pass
+        else:
+            self.lab.show()
+            self.lab.setText('Вы не заполнили урок до конца: нет описания урока')
+            flag4 = False
+        self.com = self.diff.currentText()
+        if flag1 and flag2 and flag3 and flag4:
+            self.cur.execute("INSERT INTO study_plans (name, tag, namelc, pict1, move1, pict2, move2, pict3, move3,\
+            pict4, move4, pict5, move5, diff) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,\
+             ?)", (self.name.text(), self.info.toPlainText(), self.name.text().lower(), self.img1, self.x1,
+                   self.img2, self.x2, self.img3, self.x3, self.img4, self.x4, self.img5, self.x5, self.com))
+            self.con.commit()
+            self.con.close()
+            self.back()
+
+
+class Lessonsst(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.windowmain()
+
+    def windowmain(self):
+        uic.loadUi("ui/lessons_st.ui", self)
+        self.setWindowTitle("ChessTraining")
+        self.setWindowIcon(QIcon('sup/logo.png'))
+        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.send = self.sender()
+        self.commandLinkButton.clicked.connect(self.back)
+        self.con = sqlite3.connect("users.sqlite")
+        self.cur = self.con.cursor()
+        self.poiskbut.clicked.connect(self.update_result)
+        self.openbtn.clicked.connect(self.open_less)
+        self.modified = {}
+        self.titles = None
+
+    def keyPressEvent(self, event):
+        if event.key() == 16777220:
+            self.open_less()
+
+    def open_less(self):
+        title = self.tableWidget.currentItem().text()
+        self.viewR = ViewLesson(title)
+        self.viewR.show()
+        self.le = Lessonsst()
+        self.le.hide()
+
+    def update_result(self):
+        self.wenty = self.lessline.text()
+        if self.wenty and self.diff.currentText() != "Выберите...":
+            result = self.cur.execute("SELECT name FROM study_plans WHERE namelc LIKE ? AND diff = ?",
+                                      (self.wenty.lower() + "%", self.diff.currentText(),)).fetchall()
+        elif self.wenty and self.diff.currentText() == "Выберите...":
+            result = self.cur.execute("SELECT name FROM study_plans WHERE namelc LIKE ?",
+                                      (self.wenty.lower() + "%",)).fetchall()
+        elif not self.wenty and self.diff.currentText() != "Выберите...":
+            result = self.cur.execute("SELECT name FROM study_plans WHERE diff = ?",
+                                      (self.diff.currentText(),)).fetchall()
+        else:
+            result = self.cur.execute("SELECT name FROM study_plans").fetchall()
+        self.tableWidget.setRowCount(len(result))
+        self.tableWidget.setColumnCount(len(result[0]))
+        self.titles = [description[0] for description in self.cur.description]
+        for i, elem in enumerate(result):
+            for j, val in enumerate(elem):
+                self.tableWidget.setItem(i, j, QTableWidgetItem(str(val)))
+        self.modified = {}
+
+    def back(self):
+        if self.send.objectName() == 'ychebniyplan':
+            self.backStudy = Choosemenu()
+            self.backStudy.show()
+            self.hide()
+        elif self.send.objectName() == 'ychebniyplant':
+            self.backteachstudy = TeacherChooseMenu()
+            self.backteachstudy.show()
+            self.hide()
+
+
+class ViewLesson(QMainWindow):
+    def __init__(self, name):
+        super().__init__()
+        self.mane(name)
+
+    def mane(self, name):
+        uic.loadUi('ui/Lesstipo.ui', self)
+        self.setWindowTitle("ChessTraining")
+        self.setWindowIcon(QIcon('sup/logo.png'))
+        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.tagik = name
+        self.commandLinkButton.clicked.connect(self.back)
+        self.con = sqlite3.connect("users.sqlite")
+        self.cur = self.con.cursor()
+        self.namelabel.setText(name)
+        result = self.cur.execute("SELECT tag FROM study_plans WHERE namelc = ?", (name.lower(),)).fetchone()
+        self.textBrowser.setText(result[0])
+        self.commandLinkButton2.clicked.connect(self.tries)
+
+    def tries(self):
+        self.ti = Test(self.tagik)
+        self.ti.show()
+        self.hide()
+
+    def back(self):
+        self.hide()
+
+
+class Test(QMainWindow):
+    def __init__(self, tagik):
+        super().__init__()
+        self.image = QLabel(self)
+        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.k = 1
+        self.c = 0
+        self.konec1, self.konec2, self.konec3, self.konec4, self.konec5 = None, None, None, None, None
+        self.tries(tagik)
+        self.show_photo()
+
+
+    def tries(self, tagik):
+        self.otv1, self.otv2, self.otv3, self.otv4, self.otv5 = "", "", "", "", ""
+        self.xxx1, self.xxx2, self.xxx3, self.xxx4, self.xxx5, self.xxx6, self.xxx7, self.xxx8, self.xxx9, \
+            self.xxx10 = 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+        self.tagik = tagik
+        uic.loadUi('ui/try1.ui',self)
+        self.num.setText(f"Задача №{self.k}")
+        self.setWindowTitle("ChessTraining")
+        self.setWindowIcon(QIcon('sup/logo.png'))
+        self.pb.setValue(self.c)
+        self.commandLinkButton4.hide()
+        self.commandLinkButton3.hide()
+        self.con = sqlite3.connect("users.sqlite")
+        self.cur = self.con.cursor()
+        result = self.cur.execute("SELECT * FROM study_plans WHERE namelc = ?", (self.tagik.lower(),)).fetchone()
+        self.namelabel.setText(self.tagik)
+        self.ans = [a for a in result if a != None]
+        picts = self.cur.execute("SELECT * FROM study_plans WHERE namelc = ?", (self.tagik.lower(),)).fetchone()
+        self.picts = [picts[3], picts[5], picts[7], picts[9], picts[11]]
+        self.q1, self.q2, self.q3, self.q4, self.q5 = self.ans[4].split(", "), self.ans[6].split(", "), self.ans[8].split(", "), \
+            self.ans[10].split(", "), self.ans[12].split(", ")
+        self.commandLinkButton.clicked.connect(self.back)
+        self.commandLinkButton2.clicked.connect(self.straight)
+        self.rulesbtn.clicked.connect(self.rul)
+        self.savebtn.clicked.connect(self.save)
+        self.commandLinkButton3.clicked.connect(self.end)
+        self.commandLinkButton4.clicked.connect(self.exit)
+
+    def exit(self):
+        self.hide()
+
+    def end(self):
+        self.flag = True
+        self.itog = True
+        if not self.konec1:
+            self.flag = False
+        if not self.konec2:
+            self.flag = False
+        if not self.konec3:
+            self.flag = False
+        if not self.konec4:
+            self.flag = False
+        if not self.konec5:
+            self.flag = False
+        if self.flag:
+            self.c = 0
+            if self.konec1 == self.ans[4]:
+                self.c += 1
+            if self.konec2 == self.ans[6]:
+                self.c += 1
+            if self.konec3 == self.ans[8]:
+                self.c += 1
+            if self.konec4 == self.ans[10]:
+                self.c += 1
+            if self.konec5 == self.ans[12]:
+                self.c += 1
+            self.pb.setValue(self.c)
+            if self.konec1 != self.ans[4] or self.konec2 != self.ans[6] or self.konec3 != self.ans[8] or\
+                    self.konec4 != self.ans[10] or self.konec5 != self.ans[12]:
+                self.itog = False
+            if self.itog:
+                self.poditog()
+
+    def poditog(self):
+        self.labelit.setText("Поздравляем, вы прошли этот урок!")
+        self.commandLinkButton3.hide()
+        self.commandLinkButton4.show()
+
+
+    def save(self):
+        if self.xxx1 == 1:
+            self.x1 = self.xod1.text()
+        else:
+            self.x1 = ''
+        if self.xxx2 == 1:
+            self.x2 = self.xod2.text()
+        else:
+            self.x2 = ''
+        if self.xxx3 == 1:
+            self.x3 = self.xod3.text()
+        else:
+            self.x3 = ''
+        if self.xxx4 == 1:
+            self.x4 = self.xod4.text()
+        else:
+            self.x4 = ''
+        if self.xxx5 == 1:
+            self.x5 = self.xod5.text()
+        else:
+            self.x5 = ''
+        if self.xxx6 == 1:
+            self.x6 = self.xod6.text()
+        else:
+            self.x6 = ''
+        if self.xxx7 == 1:
+            self.x7 = self.xod7.text()
+        else:
+            self.x7 = ''
+        if self.xxx8 == 1:
+            self.x8 = self.xod8.text()
+        else:
+            self.x8 = ''
+        if self.xxx9 == 1:
+            self.x9 = self.xod9.text()
+        else:
+            self.x9 = ''
+        if self.xxx10 == 1:
+            self.x10 = self.xod10.text()
+        else:
+            self.x10 = ''
+        s = [self.x1, self.x2, self.x3, self.x4, self.x5, self.x6, self.x7, self.x8, self.x9, self.x10]
+        s = [a for a in s if a != '']
+        if self.k == 1:
+            self.otv1 = ", ".join(s).lstrip().rstrip()
+            self.konec1 = self.otv1
+        if self.k == 2:
+            self.otv2 = ", ".join(s)
+            self.konec2 = self.otv2
+        if self.k == 3:
+            self.otv3 = ", ".join(s)
+            self.konec3 = self.otv3
+        if self.k == 4:
+            self.otv4 = ", ".join(s)
+            self.konec4 = self.otv4
+        if self.k == 5:
+            self.otv5 = ", ".join(s)
+            self.konec5 = self.otv5
+
+    def show_photo(self):
+        if self.picts is not None:
+            self.image.clear()
+            a = "img/" + self.picts[self.k - 1]
+            pic = self.compress_photo(a)
+            self.pixmap = QPixmap(pic)
+            self.image.move(50, 100)
+            self.image.resize(400, 400)
+            self.image.setPixmap(self.pixmap)
+            if self.k == 1:
+                self.r1 = self.prov(self.q1)
+            if self.k == 2:
+                self.r2 = self.prov(self.q2)
+            if self.k == 3:
+                self.r3 = self.prov(self.q3)
+            if self.k == 4:
+                self.r4 = self.prov(self.q4)
+            if self.k == 5:
+                self.r5 = self.prov(self.q5)
+
+    def rul(self):
+        self.rup = Rule()
+        self.rup.show()
+
+    def straight(self):
+        if 0 < self.k < 5:
+            self.tries(self.tagik)
+            self.k += 1
+            self.num.setText(f"Задача №{self.k}")
+            self.commandLinkButton2.show()
+            self.commandLinkButton3.hide()
+        elif self.k <= 0:
+            self.hide()
+        if self.k == 5:
+            self.commandLinkButton2.hide()
+            self.commandLinkButton3.show()
+        self.show_photo()
+
+    def prov(self, arg):
+        self.xod10.show()
+        if len(arg) < 10:
+            self.xxx10 = 0
+            self.xod10.hide()
+        self.xod9.show()
+        if len(arg) < 9:
+            self.xxx9 = 0
+            self.xod9.hide()
+        self.xod8.show()
+        if len(arg) < 8:
+            self.xxx8 = 0
+            self.xod8.hide()
+        self.xod7.show()
+        if len(arg) < 7:
+            self.xxx7 = 0
+            self.xod7.hide()
+        self.xod6.show()
+        if len(arg) < 6:
+            self.xxx6 = 0
+            self.xod6.hide()
+        self.xod5.show()
+        if len(arg) < 5:
+            self.xxx5 = 0
+            self.xod5.hide()
+        self.xod4.show()
+        if len(arg) < 4:
+            self.xxx4 = 0
+            self.xod4.hide()
+        self.xod3.show()
+        if len(arg) < 3:
+            self.xxx3 = 0
+            self.xod3.hide()
+        self.xod2.show()
+        if len(arg) < 2:
+            self.xxx2 = 0
+            self.xod2.hide()
+        self.xod1.show()
+        if len(arg) < 1:
+            self.xxx1 = 0
+            self.xod1.hide()
+            return 0
+        return len(arg)
+
+    def compress_photo(self, pict):
+        im = Image.open(pict)
+        im2 = im.resize((400, 400))
+        im2.save(pict)
+        return pict
+
+    def back(self):
+        self.k -= 1
+        if 0 < self.k < 5:
+            self.tries(self.tagik)
+            self.num.setText(f"Задача №{self.k}")
+            self.commandLinkButton2.show()
+            self.commandLinkButton3.hide()
+        elif self.k <= 0:
+            self.hide()
+        self.show_photo()
+
+
+class Rule(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.ru()
+
+    def ru(self):
+        uic.loadUi("ui/rules.ui", self)
+        self.setWindowTitle("ChessTraining")
+        self.setWindowIcon(QIcon('sup/logo.png'))
+        self.commandLinkButton.clicked.connect(self.back)
+
+    def back(self):
+        self.hide()
+
+
+class Sprav(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.windowmain()
+
+    def windowmain(self):
+        uic.loadUi("ui/spravo4ka.ui", self)
+        self.setWindowTitle("ChessTraining")
+        self.setWindowIcon(QIcon('sup/logo.png'))
+        self.send = self.sender()
+        self.commandLinkButton.clicked.connect(self.back)
+        self.addtem.clicked.connect(self.addtems)
+        self.poisktem.clicked.connect(self.findtem)
+        self.con = sqlite3.connect("users.sqlite")
+        self.modified = {}
+        self.titles = None
+        self.opentem.clicked.connect(self.open_temy)
+
+    def keyPressEvent(self, event):
+        if event.key() == 16777220:
+            self.open_temy()
+
+    def open_temy(self):
+        title = self.tabletem.currentItem().text()
+        self.viewR = ViewTem(title)
+        self.viewR.show()
+        self.le = Sprav()
+        self.le.hide()
+
+    def findtem(self):
+        cur = self.con.cursor()
+        self.wenty = self.temline.text()
+        if self.wenty:
+            result = cur.execute("SELECT * FROM tems WHERE name LIKE ?",
+                                 (self.temline.text() + "%",)).fetchall()
+        else:
+            result = cur.execute("SELECT * FROM tems").fetchall()
+        self.tabletem.setRowCount(len(result))
+        if not result:
+            self.statusBar().showMessage('Ничего не нашлось')
+            return
+        else:
+            self.statusBar().showMessage(f"Нашлась запись с id = {self.temline.text}")
+        self.tabletem.setColumnCount(len(result[0]))
+        self.titles = [description[0] for description in cur.description]
+        for i, elem in enumerate(result):
+            for j, val in enumerate(elem):
+                self.tabletem.setItem(i, j, QTableWidgetItem(str(val)))
+        self.modified = {}
+
+    def addtems(self):
+        self.addtemwin = AddTems()
+        self.addtemwin.show()
+        self.sprik = Sprav()
+        self.sprik.hide()
+
+    def back(self):
+        if self.send.objectName() == 'spravka':
+            self.backStudy = Choosemenu()
+            self.backStudy.show()
+            self.hide()
+        elif self.send.objectName() == 'spravkat':
+            self.backteachstudy = TeacherChooseMenu()
+            self.backteachstudy.show()
+            self.hide()
+
+
+class ViewTem(QMainWindow):
+    def __init__(self, name):
+        super().__init__()
+        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.mane(name)
+
+    def mane(self, name):
+        uic.loadUi('ui/Tematipo.ui', self)
+        self.setWindowTitle("ChessTraining")
+        self.setWindowIcon(QIcon('sup/logo.png'))
+        self.commandLinkButton.clicked.connect(self.back)
+        self.con = sqlite3.connect("users.sqlite")
+        self.cur = self.con.cursor()
+        self.namelabel.setText(name)
+        result = self.cur.execute("SELECT info FROM tems WHERE namelc = ?", (name.lower(),)).fetchone()
+        self.textBrowser.setText(result[0])
+
+
+    def back(self):
+        #  self.l = Lessonsst()
+        #  self.l.show()
+        self.hide()
+
+
+class AddTems(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.mainw()
+
+    def mainw(self):
+        uic.loadUi("ui/addtem.ui", self)
+        self.setWindowTitle("ChessTraining")
+        self.setWindowIcon(QIcon('sup/logo.png'))
+        self.commandLinkButton.clicked.connect(self.back)
+        self.addbtn.clicked.connect(self.addtem)
+
+
+    def addtem(self):
+        self.name = self.temname.text()
+        self.info = self.temtext.toPlainText()
+        self.con = sqlite3.connect("users.sqlite")
+        self.cur = self.con.cursor()
+        self.cur.execute("INSERT INTO tems (name, info) VALUES (?, ?)", (self.name, self.info,))
+        self.con.commit()
+        self.hide()
+
+    def back(self):
+        self.hide()
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = Vxodtyt()
+    ex.show()
+    sys.exit(app.exec_())
