@@ -13,21 +13,49 @@ ENG = "qwertyuiopasdfghjklzxcvbnm"
 NUM = "1234567890"
 
 
+import socket
+
+
+class DBClient:
+    def __init__(self):
+        self.server_address = ('localhost', 8686)
+        self.timeout = 1
+
+    def execute_query(self, query, params=None):
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(self.timeout)
+                s.connect(self.server_address)
+                # Формируем запрос
+                query_data = f"{query}|||{params}" if params else query
+                print(f"Отправка запроса: {query_data}")
+                s.sendall(query_data.encode('utf-8'))
+
+                # Получаем ответ
+                data = b""
+                while True:
+                    try:
+                        chunk = s.recv(4096)
+                        if not chunk:
+                            break
+                        data += chunk
+                    except socket.timeout:
+                        print("Таймаут приема данных")
+                        break
+
+                print(f"Получен ответ: {data}")
+                return eval(data.decode()) if data else None
+
+        except Exception as e:
+            print(f"Ошибка соединения: {e}")
+            return None
+
+
 class Vxodtyt(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.con = sqlite3.connect("users.sqlite")
-        self.setStyleSheet("#Log_window{background-image: url('sup/back4.jpg'); no-repeat;}")
-        self.cur = self.con.cursor()
-        with self.con:
-            self.cur.execute('''
-               CREATE TABLE IF NOT EXISTS pass (
-               id       INTEGER PRIMARY KEY AUTOINCREMENT,
-               name     TEXT,
-               password TEXT
-               );
-            ''')
-        self.con.close()
+        self.db_client = DBClient()
+        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
         self.main()
 
     def main(self):
@@ -38,39 +66,79 @@ class Vxodtyt(QMainWindow):
         self.regbtn.clicked.connect(self.register)
 
     def wave(self):
-        self.con = sqlite3.connect("users.sqlite")
-        self.cur = self.con.cursor()
+        #response = self.db_client.execute_query("PING")
+        #print(response)  # Должен получить "PONG"
+        #print(1)
+        #result = self.db_client.execute_query("SELECT 1")
+        #print(result)  # Должно вернуть [(1,)]
+        print(2)
+
         self.user_login = self.login.text()
         self.user_password = self.password.text()
-        self.cur.execute('SELECT * FROM pass WHERE name = ? AND password = ?', (self.user_login, self.user_password))
-        if self.cur.fetchone() != None:
+        # try:
+        #     print("Отправка запроса...")
+        #     result = self.db_client.execute_query(
+        #         'SELECT * FROM pass WHERE name = ? AND password = ?',
+        #         (self.user_login, self.user_password)
+        #     )
+        #     print(f"Результат: {result}")  # Логируем ответ
+        #
+        #     if result:
+        #         print("Успешная авторизация")
+        #         # ... ваш код ...
+        #     else:
+        #         print("Неверные данные")
+        #         self.lab.setText("Неверный логин или пароль")
+        #
+        # except Exception as e:
+        #     print(f"Ошибка в wave(): {e}")
+        #     self.lab.setText("Ошибка подключения к серверу")
+        result = self.db_client.execute_query('SELECT * FROM pass WHERE name = ? AND password = ?',
+                                              (self.user_login, self.user_password))
+        print(3)
+        if result[0][0]:
+            print(4)
             val = self.get_val()
+            print(val)
             if val == 1:
                 self.studyyy = TeacherChooseMenu()
                 self.studyyy.show()
-                self.con.commit()
                 self.hide()
             elif val == 0:
                 self.study = Choosemenu()
                 self.study.show()
-                self.con.commit()
                 self.hide()
-            self.con.close()
         else:
             self.lab.setText("Имя пользователя или пароль неверные")
 
     def get_val(self):
-        self.con = sqlite3.connect("users.sqlite")
-        self.cur = self.con.cursor()
-        self.cur.execute('SELECT val FROM pass WHERE name = ? AND password = ?', (self.user_login, self.user_password))
-        val = self.cur.fetchone()[0]
-        return val
+        print("5: Начало get_val()")  # Логируем вход в функцию
+
+        try:
+            # Получаем результат запроса
+            result = self.db_client.execute_query(
+                'SELECT val FROM pass WHERE name = ? AND password = ?',
+                (self.user_login, self.user_password)
+            )
+            print(f"6: Результат запроса: {result}")
+
+            if not result:
+                print("7: Пользователь не найден")
+                return None
+
+            val = result[0][0]
+            #print(f"8: Получено значение val: {val}")
+            return val
+
+        except Exception as e:
+            #print(f"Ошибка в get_val(): {e}")
+            return None
 
     def register(self):
         uic.loadUi("ui/t2.ui", self)
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
-        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
         self.asteach.clicked.connect(self.reguser)
         self.asuser.clicked.connect(self.reguser)
         self.commandLinkButton2.clicked.connect(self.back)
@@ -91,19 +159,17 @@ class Vxodtyt(QMainWindow):
         uic.loadUi("ui/t3.ui", self)
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
-        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
         self.registerbtn.clicked.connect(self.prov)
         self.commandLinkButton3.clicked.connect(self.back)
 
 
     def prov(self):
-        self.con = sqlite3.connect("users.sqlite")
-        self.cur = self.con.cursor()
         flag1, flag2, flags, flagup, flagdo, n = False,  False,  False,  False,  False, False
         self.login_reg = self.loginreg.text()
         self.password_reg = self.passreg.text()
-        self.cur.execute('SELECT name FROM pass WHERE name = ?', (self.login_reg,))
-        if not self.cur.fetchone():
+        result = self.db_client.execute_query('SELECT name FROM pass WHERE name = ?', (self.login_reg,))
+        if not result.fetchone():
             flag1 = True
         else:
             self.labeler.setText("Такой пользователь уже есть")
@@ -119,9 +185,7 @@ class Vxodtyt(QMainWindow):
             elif i == i.lower():
                 flagdo = True
         if flagup and flags and flag2 and flag1 and flagdo and n:
-            self.cur.execute("INSERT INTO 'pass' (name, password, val) VALUES (?, ?, ?)", (self.login_reg, self.password_reg, self.flag))
-            self.con.commit()
-            self.con.close()
+            result.execute("INSERT INTO 'pass' (name, password, val) VALUES (?, ?, ?)", (self.login_reg, self.password_reg, self.flag))
             self.main()
         elif not flag2 or not flagup or not flagdo or not flags:
             self.labeler.setText("Пароль не соответствует критериям")
@@ -136,7 +200,7 @@ class Choosemenu(QMainWindow):
         uic.loadUi("ui/mainchoose.ui", self)
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
-        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
         self.commandLinkButton.clicked.connect(self.back)
         self.ychebniyplan.clicked.connect(self.LES)
         self.spravka.clicked.connect(self.SPR)
@@ -167,7 +231,7 @@ class TeacherChooseMenu(Choosemenu):
         uic.loadUi("ui/teachmainchoose.ui", self)
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
-        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
         self.ychebniyplant.clicked.connect(self.LES)
         self.spravkat.clicked.connect(self.SPR)
         self.teacherbtn.clicked.connect(self.teacher)
@@ -188,7 +252,7 @@ class Teach(QMainWindow):
         uic.loadUi('ui/lessons_plans.ui', self)
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
-        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
         self.addbtn.clicked.connect(self.addi)
         self.commandLinkButton.clicked.connect(self.back)
         self.con = sqlite3.connect("users.sqlite")
@@ -265,7 +329,7 @@ class AddLess(QMainWindow):
         self.lab.hide()
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
-        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
         self.con = sqlite3.connect("users.sqlite")
         self.cur = self.con.cursor()
         self.addbtn.clicked.connect(self.save)
@@ -323,12 +387,10 @@ class AddLess(QMainWindow):
             flag4 = False
         self.com = self.diff.currentText()
         if flag1 and flag2 and flag3 and flag4:
-            self.cur.execute("INSERT INTO study_plans (name, tag, namelc, pict1, move1, pict2, move2, pict3, move3,\
+            result = self.db_client.execute_query("INSERT INTO study_plans (name, tag, namelc, pict1, move1, pict2, move2, pict3, move3,\
             pict4, move4, pict5, move5, diff) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,\
              ?)", (self.name.text(), self.info.toPlainText(), self.name.text().lower(), self.img1, self.x1,
                    self.img2, self.x2, self.img3, self.x3, self.img4, self.x4, self.img5, self.x5, self.com))
-            self.con.commit()
-            self.con.close()
             self.back()
 
 
@@ -341,7 +403,7 @@ class Lessonsst(QMainWindow):
         uic.loadUi("ui/lessons_st.ui", self)
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
-        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
         self.send = self.sender()
         self.commandLinkButton.clicked.connect(self.back)
         self.con = sqlite3.connect("users.sqlite")
@@ -403,7 +465,7 @@ class ViewLesson(QMainWindow):
         uic.loadUi('ui/Lesstipo.ui', self)
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
-        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
         self.tagik = name
         self.commandLinkButton.clicked.connect(self.back)
         self.con = sqlite3.connect("users.sqlite")
@@ -426,7 +488,7 @@ class Test(QMainWindow):
     def __init__(self, tagik):
         super().__init__()
         self.image = QLabel(self)
-        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
         self.k = 1
         self.c = 0
         self.konec1, self.konec2, self.konec3, self.konec4, self.konec5 = None, None, None, None, None
@@ -680,7 +742,7 @@ class Rule(QMainWindow):
 class Sprav(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
         self.windowmain()
 
     def windowmain(self):
@@ -748,7 +810,7 @@ class Sprav(QMainWindow):
 class ViewTem(QMainWindow):
     def __init__(self, name):
         super().__init__()
-        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
         self.mane(name)
 
     def mane(self, name):
@@ -772,7 +834,7 @@ class ViewTem(QMainWindow):
 class AddTems(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setStyleSheet("#MainWindow{background-image: url('sup/back3.jpg'); no-repeat;}")
+        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
         self.mainw()
 
     def mainw(self):
