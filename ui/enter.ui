@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">#MainWindow{background-image: url('sup/back4.jpg');}</string>
+   <string notr="true">#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="label">
