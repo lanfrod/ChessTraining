@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>760</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="namelabel">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>20</y>
+      <width>521</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Calibri</family>
+      <pointsize>15</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+    background: transparent;  /* Прозрачный фон */
+    color: white;            /* Белый текст */
+    border: none;           /* Без рамки */
+    padding: 2px;           /* Небольшой отступ */
+}
+
+/* Для QLabel с картинкой (если нужно) */
+QLabel[hasImage=&quot;true&quot;] {
+    qproperty-alignment: AlignCenter;  /* Выравнивание по центру */
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QTextBrowser" name="textBrowser">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>100</y>
+      <width>661</width>
+      <height>391</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Calibri</family>
+      <pointsize>15</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">/* Основной стиль QTextBrowser */
+QTextBrowser {
+    background: transparent;    /* Прозрачный фон */
+    color: white;              /* Белый текст */
+    border: 1px solid white;   /* Четкая белая граница */
+    border-radius: 3px;        /* Легкое скругление углов */
+    padding: 5px;             /* Отступ текста от границ */
+}
+
+/* Стиль при наведении */
+QTextBrowser:hover {
+    border: 1px solid #cccccc; /* Светлее при наведении */
+}
+
+/* Стиль ссылок */
+QTextBrowser a {
+    color: #4da6ff;           /* Голубой цвет ссылок */
+    text-decoration: none;    /* Убираем подчеркивание */
+}
+
+QTextBrowser a:hover {
+    text-decoration: underline; /* Подчеркиваем при наведении */
+}
+
+/* Полосы прокрутки */
+QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 0px;
+}
+
+QScrollBar::handle:vertical {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+QScrollBar::add-line:vertical, 
+QScrollBar::sub-line:vertical {
+    background: none;
+    border: none;
+}</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QCommandLinkButton" name="commandLinkButton">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>510</y>
+      <width>101</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>15</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background: transparent;    /* Полная прозрачность фона */
+    color: white;              /* Белый текст */
+    border: 1px solid white;   /* Белая рамка (опционально) */
+    border-radius: 4px;        /* Закругленные углы */
+    padding: 5px 10px;         /* Отступы внутри кнопки */
+}
+
+/* Эффект при наведении курсора */
+QPushButton:hover {
+    background: rgba(255, 255, 255, 0.1);  /* Легкая подсветка */
+}
+
+/* Эффект при нажатии */
+QPushButton:pressed {
+    background: rgba(255, 255, 255, 0.2);  /* Затемнение */
+}</string>
+    </property>
+    <property name="text">
+     <string>Назад</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../sup/backwardarrow_85726.png</normaloff>../sup/backwardarrow_85726.png</iconset>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>760</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

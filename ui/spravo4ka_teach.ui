@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>564</width>
+    <height>562</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>26</x>
+      <y>40</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Calibri</family>
+      <pointsize>15</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+    background: transparent;  /* Прозрачный фон */
+    color: white;            /* Белый текст */
+    border: none;           /* Без рамки */
+    padding: 2px;           /* Небольшой отступ */
+}
+
+/* Для QLabel с картинкой (если нужно) */
+QLabel[hasImage=&quot;true&quot;] {
+    qproperty-alignment: AlignCenter;  /* Выравнивание по центру */
+}</string>
+    </property>
+    <property name="text">
+     <string>Тема:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="temline">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>40</y>
+      <width>201</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    background: transparent;    /* Прозрачный фон */
+    color: white;              /* Белый текст */
+    border: 1px solid white;   /* Белая рамка */
+    border-radius: 4px;        /* Закругленные углы */
+    padding: 5px 10px;         /* Отступы внутри */
+}
+
+/* Эффекты при взаимодействии */
+QLineEdit:hover {
+    border: 1px solid #cccccc; /* Светлая рамка при наведении */
+}
+
+QLineEdit:focus {
+    border: 1px solid #ffffff; /* Яркая рамка при фокусе */
+}</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="poisktem">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>40</y>
+      <width>161</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background: transparent;    /* Полная прозрачность фона */
+    color: white;              /* Белый текст */
+    border: 1px solid white;   /* Белая рамка (опционально) */
+    border-radius: 4px;        /* Закругленные углы */
+    padding: 5px 10px;         /* Отступы внутри кнопки */
+}
+
+/* Эффект при наведении курсора */
+QPushButton:hover {
+    background: rgba(255, 255, 255, 0.1);  /* Легкая подсветка */
+}
+
+/* Эффект при нажатии */
+QPushButton:pressed {
+    background: rgba(255, 255, 255, 0.2);  /* Затемнение */
+}</string>
+    </property>
+    <property name="text">
+     <string>Поиск</string>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="tableWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>531</width>
+      <height>331</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <attribute name="horizontalHeaderDefaultSectionSize">
+     <number>531</number>
+    </attribute>
+   </widget>
+   <widget class="QPushButton" name="opentem">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>440</y>
+      <width>161</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background: transparent;    /* Полная прозрачность фона */
+    color: white;              /* Белый текст */
+    border: 1px solid white;   /* Белая рамка (опционально) */
+    border-radius: 4px;        /* Закругленные углы */
+    padding: 5px 10px;         /* Отступы внутри кнопки */
+}
+
+/* Эффект при наведении курсора */
+QPushButton:hover {
+    background: rgba(255, 255, 255, 0.1);  /* Легкая подсветка */
+}
+
+/* Эффект при нажатии */
+QPushButton:pressed {
+    background: rgba(255, 255, 255, 0.2);  /* Затемнение */
+}</string>
+    </property>
+    <property name="text">
+     <string>Открыть</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="addtem">
+    <property name="geometry">
+     <rect>
+      <x>380</x>
+      <y>440</y>
+      <width>161</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background: transparent;    /* Полная прозрачность фона */
+    color: white;              /* Белый текст */
+    border: 1px solid white;   /* Белая рамка (опционально) */
+    border-radius: 4px;        /* Закругленные углы */
+    padding: 5px 10px;         /* Отступы внутри кнопки */
+}
+
+/* Эффект при наведении курсора */
+QPushButton:hover {
+    background: rgba(255, 255, 255, 0.1);  /* Легкая подсветка */
+}
+
+/* Эффект при нажатии */
+QPushButton:pressed {
+    background: rgba(255, 255, 255, 0.2);  /* Затемнение */
+}</string>
+    </property>
+    <property name="text">
+     <string>Добавить</string>
+    </property>
+   </widget>
+   <widget class="QCommandLinkButton" name="commandLinkButton">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>101</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>15</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background: transparent;    /* Полная прозрачность фона */
+    color: white;              /* Белый текст */
+    border: 1px solid white;   /* Белая рамка (опционально) */
+    border-radius: 4px;        /* Закругленные углы */
+    padding: 5px 10px;         /* Отступы внутри кнопки */
+}
+
+/* Эффект при наведении курсора */
+QPushButton:hover {
+    background: rgba(255, 255, 255, 0.1);  /* Легкая подсветка */
+}
+
+/* Эффект при нажатии */
+QPushButton:pressed {
+    background: rgba(255, 255, 255, 0.2);  /* Затемнение */
+}</string>
+    </property>
+    <property name="text">
+     <string>Назад</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../sup/ar.png</normaloff>../sup/ar.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>40</width>
+      <height>25</height>
+     </size>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="deltem">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>440</y>
+      <width>171</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background: transparent;    /* Полная прозрачность фона */
+    color: white;              /* Белый текст */
+    border: 1px solid white;   /* Белая рамка (опционально) */
+    border-radius: 4px;        /* Закругленные углы */
+    padding: 5px 10px;         /* Отступы внутри кнопки */
+}
+
+/* Эффект при наведении курсора */
+QPushButton:hover {
+    background: rgba(255, 255, 255, 0.1);  /* Легкая подсветка */
+}
+
+/* Эффект при нажатии */
+QPushButton:pressed {
+    background: rgba(255, 255, 255, 0.2);  /* Затемнение */
+}</string>
+    </property>
+    <property name="text">
+     <string>Удалить</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>564</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

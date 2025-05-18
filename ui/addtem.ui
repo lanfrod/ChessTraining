@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>688</width>
+    <height>680</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Yu Gothic UI</family>
+    <pointsize>9</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Добавить статью</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>60</y>
+      <width>211</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Calibri</family>
+      <pointsize>15</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+    background: transparent;  /* Прозрачный фон */
+    color: white;            /* Белый текст */
+    border: none;           /* Без рамки */
+    padding: 2px;           /* Небольшой отступ */
+}
+
+/* Для QLabel с картинкой (если нужно) */
+QLabel[hasImage=&quot;true&quot;] {
+    qproperty-alignment: AlignCenter;  /* Выравнивание по центру */
+}</string>
+    </property>
+    <property name="text">
+     <string>Полезная информация:</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="temtext">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>90</y>
+      <width>651</width>
+      <height>421</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">/* Основной стиль текстового поля */
+QTextEdit {
+    background: transparent;    /* Полностью прозрачный фон */
+    color: white;              /* Белый текст */
+    border: 1px solid white;   /* Четкая белая граница */
+    border-radius: 3px;        /* Легкое скругление углов */
+    padding: 5px;             /* Отступ текста от границ */
+}
+
+/* Стиль при фокусе (граница становится ярче) */
+QTextEdit:focus {
+    border: 1px solid #ffffff; /* Ярко-белая граница */
+}
+
+/* Стиль полосы прокрутки (необязательно) */
+QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+}
+QScrollBar::handle:vertical {
+    background: rgba(255, 255, 255, 0.3);
+}</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="addbtn">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>520</y>
+      <width>181</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Yu Gothic UI</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background: transparent;    /* Полная прозрачность фона */
+    color: white;              /* Белый текст */
+    border: 1px solid white;   /* Белая рамка (опционально) */
+    border-radius: 4px;        /* Закругленные углы */
+    padding: 5px 10px;         /* Отступы внутри кнопки */
+}
+
+/* Эффект при наведении курсора */
+QPushButton:hover {
+    background: rgba(255, 255, 255, 0.1);  /* Легкая подсветка */
+}
+
+/* Эффект при нажатии */
+QPushButton:pressed {
+    background: rgba(255, 255, 255, 0.2);  /* Затемнение */
+}</string>
+    </property>
+    <property name="text">
+     <string>Добавить</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>25</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Calibri</family>
+      <pointsize>15</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+    background: transparent;  /* Прозрачный фон */
+    color: white;            /* Белый текст */
+    border: none;           /* Без рамки */
+    padding: 2px;           /* Небольшой отступ */
+}
+
+/* Для QLabel с картинкой (если нужно) */
+QLabel[hasImage=&quot;true&quot;] {
+    qproperty-alignment: AlignCenter;  /* Выравнивание по центру */
+}</string>
+    </property>
+    <property name="text">
+     <string>Тема:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="temname">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>30</y>
+      <width>601</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Yu Gothic UI</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    background: transparent;    /* Прозрачный фон */
+    color: white;              /* Белый текст */
+    border: 1px solid white;   /* Белая рамка */
+    border-radius: 4px;        /* Закругленные углы */
+    padding: 5px 10px;         /* Отступы внутри */
+}
+
+/* Эффекты при взаимодействии */
+QLineEdit:hover {
+    border: 1px solid #cccccc; /* Светлая рамка при наведении */
+}
+
+QLineEdit:focus {
+    border: 1px solid #ffffff; /* Яркая рамка при фокусе */
+}</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>780</x>
+      <y>620</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Yu Gothic UI</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Назад</string>
+    </property>
+   </widget>
+   <widget class="QCommandLinkButton" name="commandLinkButton">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>570</y>
+      <width>101</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>15</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background: transparent;    /* Полная прозрачность фона */
+    color: white;              /* Белый текст */
+    border: 1px solid white;   /* Белая рамка (опционально) */
+    border-radius: 4px;        /* Закругленные углы */
+    padding: 5px 10px;         /* Отступы внутри кнопки */
+}
+
+/* Эффект при наведении курсора */
+QPushButton:hover {
+    background: rgba(255, 255, 255, 0.1);  /* Легкая подсветка */
+}
+
+/* Эффект при нажатии */
+QPushButton:pressed {
+    background: rgba(255, 255, 255, 0.2);  /* Затемнение */
+}</string>
+    </property>
+    <property name="text">
+     <string>Назад</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../sup/backwardarrow_85726.png</normaloff>../sup/backwardarrow_85726.png</iconset>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>688</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
