@@ -1,16 +1,20 @@
 import sqlite3
 import sys
-
 from PyQt5 import QtCore
-
 from PIL import Image
 from PyQt5 import uic
 from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QLabel, QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QApplication, QAbstractItemView \
+    ,  QMainWindow, QTableWidgetItem, QLabel, QFileDialog, QMessageBox
+from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QFileDialog, QTableWidget
+from PyQt5.QtWidgets import QLabel, QAbstractItemView, QMessageBox, QHeaderView, QInputDialog
 
 PASSWORD_SYMBOLS = "!%@#$^&*"
 ENG = "qwertyuiopasdfghjklzxcvbnm"
 NUM = "1234567890"
+back = "#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}"
+
 
 
 import socket
@@ -18,8 +22,8 @@ import socket
 
 class DBClient:
     def __init__(self):
-        self.server_address = ('localhost', 8686)
-        self.timeout = 1
+        self.server_address = ('localhost', 8687)
+        self.timeout = 0.2
 
     def execute_query(self, query, params=None):
         try:
@@ -55,7 +59,7 @@ class Vxodtyt(QMainWindow):
     def __init__(self):
         super().__init__()
         self.db_client = DBClient()
-        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
+        self.setStyleSheet(back)
         self.main()
 
     def main(self):
@@ -96,20 +100,26 @@ class Vxodtyt(QMainWindow):
         result = self.db_client.execute_query('SELECT * FROM pass WHERE name = ? AND password = ?',
                                               (self.user_login, self.user_password))
         print(3)
-        if result[0][0]:
-            print(4)
-            val = self.get_val()
-            print(val)
-            if val == 1:
-                self.studyyy = TeacherChooseMenu()
-                self.studyyy.show()
-                self.hide()
-            elif val == 0:
-                self.study = Choosemenu()
-                self.study.show()
-                self.hide()
+        print(result)
+        if result != []:
+            if result[0][0]:
+                print(4)
+                val = self.get_val()
+                print(val)
+                if val == 1:
+                    self.studyyy = TeacherChooseMenu()
+                    self.studyyy.show()
+                    self.hide()
+                elif val == 0:
+                    self.study = Choosemenu()
+                    self.study.show()
+                    self.hide()
+            else:
+                self.lab.setText("Имя пользователя или пароль неверные")
         else:
             self.lab.setText("Имя пользователя или пароль неверные")
+        print(4)
+
 
     def get_val(self):
         print("5: Начало get_val()")  # Логируем вход в функцию
@@ -138,7 +148,7 @@ class Vxodtyt(QMainWindow):
         uic.loadUi("ui/t2.ui", self)
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
-        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
+        self.setStyleSheet(back)
         self.asteach.clicked.connect(self.reguser)
         self.asuser.clicked.connect(self.reguser)
         self.commandLinkButton2.clicked.connect(self.back)
@@ -159,7 +169,7 @@ class Vxodtyt(QMainWindow):
         uic.loadUi("ui/t3.ui", self)
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
-        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
+        self.setStyleSheet(back)
         self.registerbtn.clicked.connect(self.prov)
         self.commandLinkButton3.clicked.connect(self.back)
 
@@ -169,10 +179,12 @@ class Vxodtyt(QMainWindow):
         self.login_reg = self.loginreg.text()
         self.password_reg = self.passreg.text()
         result = self.db_client.execute_query('SELECT name FROM pass WHERE name = ?', (self.login_reg,))
-        if not result.fetchone():
+        print(result)
+        if not result:
             flag1 = True
         else:
             self.labeler.setText("Такой пользователь уже есть")
+        print(2313)
         if 7 < len(self.password_reg) < 17:
             flag2 = True
         for i in self.password_reg:
@@ -184,8 +196,10 @@ class Vxodtyt(QMainWindow):
                 flagup = True
             elif i == i.lower():
                 flagdo = True
+        print(2313231321)
         if flagup and flags and flag2 and flag1 and flagdo and n:
-            result.execute("INSERT INTO 'pass' (name, password, val) VALUES (?, ?, ?)", (self.login_reg, self.password_reg, self.flag))
+            result = self.db_client.execute_query("INSERT INTO 'pass' (name, password, val) VALUES (?, ?, ?)",
+                                                  (self.login_reg, self.password_reg, self.flag))
             self.main()
         elif not flag2 or not flagup or not flagdo or not flags:
             self.labeler.setText("Пароль не соответствует критериям")
@@ -200,15 +214,19 @@ class Choosemenu(QMainWindow):
         uic.loadUi("ui/mainchoose.ui", self)
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
-        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
+        self.setStyleSheet(back)
         self.commandLinkButton.clicked.connect(self.back)
         self.ychebniyplan.clicked.connect(self.LES)
         self.spravka.clicked.connect(self.SPR)
 
     def SPR(self):
+        print(2222)
         self.SPRA = Sprav()
+        print(2222)
         self.SPRA.show()
+        print(2222)
         self.hide()
+        print(2222)
 
     def LES(self):
         self.LESIK = Lessonsst()
@@ -231,7 +249,7 @@ class TeacherChooseMenu(Choosemenu):
         uic.loadUi("ui/teachmainchoose.ui", self)
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
-        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
+        self.setStyleSheet(back)
         self.ychebniyplant.clicked.connect(self.LES)
         self.spravkat.clicked.connect(self.SPR)
         self.teacherbtn.clicked.connect(self.teacher)
@@ -252,16 +270,16 @@ class Teach(QMainWindow):
         uic.loadUi('ui/lessons_plans.ui', self)
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
-        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
+        self.setStyleSheet(back)
         self.addbtn.clicked.connect(self.addi)
         self.commandLinkButton.clicked.connect(self.back)
-        self.con = sqlite3.connect("users.sqlite")
-        self.cur = self.con.cursor()
+        self.db_client = DBClient()
         self.poiskbut.clicked.connect(self.update_result)
         self.openbtn.clicked.connect(self.open_less)
         self.modified = {}
         self.titles = None
         self.delbtn.clicked.connect(self.delete_elem)
+        self.tableWidget.doubleClicked.connect(self.open_less_on_double_click)
 
     def delete_elem(self):
         rows = list(set([i.row() for i in self.tableWidget.selectedItems()]))
@@ -270,12 +288,12 @@ class Teach(QMainWindow):
             self, '', "Действительно удалить элементы с id " + ",".join(ids),
             QMessageBox.Yes, QMessageBox.No)
         if valid == QMessageBox.Yes:
-            self.cur.execute("DELETE FROM study_plans WHERE name = ?", (self.tableWidget.currentItem().text(), ))
-            self.con.commit()
+            result = self.db_client.execute_query("DELETE FROM study_plans WHERE name = ?",
+                                                   (self.tableWidget.currentItem().text(), ))
 
-    def keyPressEvent(self, event):
-        if event.key() == 16777220:
-            self.open_less()
+    def open_less_on_double_click(self, index):
+        """Вызывается при двойном клике на таблицу."""
+        self.open_less()
 
     def open_less(self):
         title = self.tableWidget.currentItem().text()
@@ -287,23 +305,37 @@ class Teach(QMainWindow):
     def update_result(self):
         self.wenty = self.lessline.text()
         if self.wenty and self.diff.currentText() != "Выберите...":
-            result = self.cur.execute("SELECT name FROM study_plans WHERE namelc LIKE ? AND diff = ?",
-                                      (self.wenty.lower() + "%", self.diff.currentText(),)).fetchall()
+            result = self.db_client.execute_query("SELECT name FROM study_plans WHERE namelc LIKE ? AND diff = ?",
+                                      (self.wenty.lower() + "%", self.diff.currentText(),))
         elif self.wenty and self.diff.currentText() == "Выберите...":
-            result = self.cur.execute("SELECT name FROM study_plans WHERE namelc LIKE ?",
-                                      (self.wenty.lower() + "%",)).fetchall()
+            result = self.db_client.execute_query("SELECT name FROM study_plans WHERE namelc LIKE ?",
+                                      (self.wenty.lower() + "%",))
         elif not self.wenty and self.diff.currentText() != "Выберите...":
-            result = self.cur.execute("SELECT name FROM study_plans WHERE diff = ?",
-                                      (self.diff.currentText(),)).fetchall()
+            result = self.db_client.execute_query("SELECT name FROM study_plans WHERE diff = ?",
+                                      (self.diff.currentText(),))
         else:
-            result = self.cur.execute("SELECT name FROM study_plans").fetchall()
-        self.tableWidget.setRowCount(len(result))
-        self.tableWidget.setColumnCount(len(result[0]))
-        self.titles = [description[0] for description in self.cur.description]
-        for i, elem in enumerate(result):
-            for j, val in enumerate(elem):
-                self.tableWidget.setItem(i, j, QTableWidgetItem(str(val)))
-        self.modified = {}
+            result = self.db_client.execute_query("SELECT name FROM study_plans")
+        if result != []:
+            print(result)
+            self.tableWidget.setRowCount(len(result))
+            print("qqq")
+            print(result[0])
+            self.tableWidget.setColumnCount(len(result[0]))
+            print("rrr")
+            # self.titles = [description[0] for description in result.description]
+            print(123)
+            for i, elem in enumerate(result):
+                for j, val in enumerate(elem):
+                    self.tableWidget.setItem(i, j, QTableWidgetItem(str(val)))
+            self.modified = {}
+        else:
+            self.tableWidget.setRowCount(len(result))
+            self.tableWidget.setColumnCount(0)
+            for i, elem in enumerate(result):
+                for j, val in enumerate(elem):
+                    self.tableWidget.setItem(i, j, QTableWidgetItem(str(val)))
+            self.modified = {}
+
 
     def back(self):
         self.t = TeacherChooseMenu()
@@ -329,9 +361,8 @@ class AddLess(QMainWindow):
         self.lab.hide()
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
-        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
-        self.con = sqlite3.connect("users.sqlite")
-        self.cur = self.con.cursor()
+        self.setStyleSheet(back)
+        self.db_client = DBClient()
         self.addbtn.clicked.connect(self.save)
         self.commandLinkButton1.clicked.connect(self.op)
         self.commandLinkButton2.clicked.connect(self.op)
@@ -403,19 +434,19 @@ class Lessonsst(QMainWindow):
         uic.loadUi("ui/lessons_st.ui", self)
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
-        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
+        self.setStyleSheet(back)
         self.send = self.sender()
         self.commandLinkButton.clicked.connect(self.back)
-        self.con = sqlite3.connect("users.sqlite")
-        self.cur = self.con.cursor()
+        self.db_client = DBClient()
         self.poiskbut.clicked.connect(self.update_result)
         self.openbtn.clicked.connect(self.open_less)
         self.modified = {}
         self.titles = None
+        self.tableWidget.doubleClicked.connect(self.open_less_on_double_click)
 
-    def keyPressEvent(self, event):
-        if event.key() == 16777220:
-            self.open_less()
+    def open_less_on_double_click(self, index):
+        """Вызывается при двойном клике на таблицу."""
+        self.open_less()
 
     def open_less(self):
         title = self.tableWidget.currentItem().text()
@@ -427,23 +458,36 @@ class Lessonsst(QMainWindow):
     def update_result(self):
         self.wenty = self.lessline.text()
         if self.wenty and self.diff.currentText() != "Выберите...":
-            result = self.cur.execute("SELECT name FROM study_plans WHERE namelc LIKE ? AND diff = ?",
-                                      (self.wenty.lower() + "%", self.diff.currentText(),)).fetchall()
+            result = self.db_client.execute_query("SELECT name FROM study_plans WHERE namelc LIKE ? AND diff = ?",
+                                      (self.wenty.lower() + "%", self.diff.currentText(),))
         elif self.wenty and self.diff.currentText() == "Выберите...":
-            result = self.cur.execute("SELECT name FROM study_plans WHERE namelc LIKE ?",
-                                      (self.wenty.lower() + "%",)).fetchall()
+            result = self.db_client.execute_query("SELECT name FROM study_plans WHERE namelc LIKE ?",
+                                      (self.wenty.lower() + "%",))
         elif not self.wenty and self.diff.currentText() != "Выберите...":
-            result = self.cur.execute("SELECT name FROM study_plans WHERE diff = ?",
-                                      (self.diff.currentText(),)).fetchall()
+            result = self.db_client.execute_query("SELECT name FROM study_plans WHERE diff = ?",
+                                      (self.diff.currentText(),))
         else:
-            result = self.cur.execute("SELECT name FROM study_plans").fetchall()
-        self.tableWidget.setRowCount(len(result))
-        self.tableWidget.setColumnCount(len(result[0]))
-        self.titles = [description[0] for description in self.cur.description]
-        for i, elem in enumerate(result):
-            for j, val in enumerate(elem):
-                self.tableWidget.setItem(i, j, QTableWidgetItem(str(val)))
-        self.modified = {}
+            result = self.db_client.execute_query("SELECT name FROM study_plans")
+        if result != []:
+            print(result)
+            self.tableWidget.setRowCount(len(result))
+            print("qqq")
+            print(result[0])
+            self.tableWidget.setColumnCount(len(result[0]))
+            print("rrr")
+            # self.titles = [description[0] for description in result.description]
+            print(123)
+            for i, elem in enumerate(result):
+                for j, val in enumerate(elem):
+                    self.tableWidget.setItem(i, j, QTableWidgetItem(str(val)))
+            self.modified = {}
+        else:
+            self.tableWidget.setRowCount(len(result))
+            self.tableWidget.setColumnCount(0)
+            for i, elem in enumerate(result):
+                for j, val in enumerate(elem):
+                    self.tableWidget.setItem(i, j, QTableWidgetItem(str(val)))
+            self.modified = {}
 
     def back(self):
         if self.send.objectName() == 'ychebniyplan':
@@ -465,14 +509,13 @@ class ViewLesson(QMainWindow):
         uic.loadUi('ui/Lesstipo.ui', self)
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
-        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
+        self.setStyleSheet(back)
         self.tagik = name
         self.commandLinkButton.clicked.connect(self.back)
-        self.con = sqlite3.connect("users.sqlite")
-        self.cur = self.con.cursor()
+        self.db_client = DBClient()
         self.namelabel.setText(name)
-        result = self.cur.execute("SELECT tag FROM study_plans WHERE namelc = ?", (name.lower(),)).fetchone()
-        self.textBrowser.setText(result[0])
+        result = self.db_client.execute_query("SELECT tag FROM study_plans WHERE namelc = ?", (name.lower(),))
+        self.textBrowser.setText(result[0][0])
         self.commandLinkButton2.clicked.connect(self.tries)
 
     def tries(self):
@@ -488,7 +531,7 @@ class Test(QMainWindow):
     def __init__(self, tagik):
         super().__init__()
         self.image = QLabel(self)
-        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
+        self.setStyleSheet(back)
         self.k = 1
         self.c = 0
         self.konec1, self.konec2, self.konec3, self.konec4, self.konec5 = None, None, None, None, None
@@ -508,12 +551,11 @@ class Test(QMainWindow):
         self.pb.setValue(self.c)
         self.commandLinkButton4.hide()
         self.commandLinkButton3.hide()
-        self.con = sqlite3.connect("users.sqlite")
-        self.cur = self.con.cursor()
-        result = self.cur.execute("SELECT * FROM study_plans WHERE namelc = ?", (self.tagik.lower(),)).fetchone()
+        self.db_client = DBClient()
+        result = self.db_client.execute_query("SELECT * FROM study_plans WHERE namelc = ?", (self.tagik.lower(),))
         self.namelabel.setText(self.tagik)
-        self.ans = [a for a in result if a != None]
-        picts = self.cur.execute("SELECT * FROM study_plans WHERE namelc = ?", (self.tagik.lower(),)).fetchone()
+        self.ans = [a for a in result[0] if a != None]
+        picts = self.db_client.execute_query("SELECT * FROM study_plans WHERE namelc = ?", (self.tagik.lower(),))[0]
         self.picts = [picts[3], picts[5], picts[7], picts[9], picts[11]]
         self.q1, self.q2, self.q3, self.q4, self.q5 = self.ans[4].split(", "), self.ans[6].split(", "), self.ans[8].split(", "), \
             self.ans[10].split(", "), self.ans[12].split(", ")
@@ -742,7 +784,8 @@ class Rule(QMainWindow):
 class Sprav(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
+        self.db_client = DBClient()
+        self.setStyleSheet(back)
         self.windowmain()
 
     def windowmain(self):
@@ -753,41 +796,51 @@ class Sprav(QMainWindow):
         self.commandLinkButton.clicked.connect(self.back)
         self.addtem.clicked.connect(self.addtems)
         self.poisktem.clicked.connect(self.findtem)
-        self.con = sqlite3.connect("users.sqlite")
+        self.db_client = DBClient()
         self.modified = {}
         self.titles = None
         self.opentem.clicked.connect(self.open_temy)
+        self.tableWidget.doubleClicked.connect(self.open_less_on_double_click)
 
-    def keyPressEvent(self, event):
-        if event.key() == 16777220:
-            self.open_temy()
+    def open_less_on_double_click(self, index):
+        """Вызывается при двойном клике на таблицу."""
+        self.open_temy()
 
     def open_temy(self):
-        title = self.tabletem.currentItem().text()
+        print(2)
+        title = self.tableWidget.currentItem().text()
+        print(3)
         self.viewR = ViewTem(title)
         self.viewR.show()
         self.le = Sprav()
         self.le.hide()
 
     def findtem(self):
-        cur = self.con.cursor()
         self.wenty = self.temline.text()
+        print(self.wenty)
         if self.wenty:
-            result = cur.execute("SELECT * FROM tems WHERE name LIKE ?",
-                                 (self.temline.text() + "%",)).fetchall()
+            print("ab")
+            result = self.db_client.execute_query("SELECT * FROM tems WHERE name LIKE ?",
+                                 (self.temline.text() + "%",))
         else:
-            result = cur.execute("SELECT * FROM tems").fetchall()
-        self.tabletem.setRowCount(len(result))
+            print("ba")
+            result = self.db_client.execute_query("SELECT * FROM tems")
+
+        print(len(result))
+        self.tableWidget.setRowCount(len(result))
+        print(123)
         if not result:
+
             self.statusBar().showMessage('Ничего не нашлось')
             return
         else:
-            self.statusBar().showMessage(f"Нашлась запись с id = {self.temline.text}")
-        self.tabletem.setColumnCount(len(result[0]))
-        self.titles = [description[0] for description in cur.description]
+            self.statusBar().showMessage("")
+        print(123)
+        self.tableWidget.setColumnCount(len(result[0]))
+        print(123)
         for i, elem in enumerate(result):
             for j, val in enumerate(elem):
-                self.tabletem.setItem(i, j, QTableWidgetItem(str(val)))
+                self.tableWidget.setItem(i, j, QTableWidgetItem(str(val)))
         self.modified = {}
 
     def addtems(self):
@@ -810,7 +863,8 @@ class Sprav(QMainWindow):
 class ViewTem(QMainWindow):
     def __init__(self, name):
         super().__init__()
-        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
+        self.db_client = DBClient()
+        self.setStyleSheet(back)
         self.mane(name)
 
     def mane(self, name):
@@ -818,11 +872,12 @@ class ViewTem(QMainWindow):
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
         self.commandLinkButton.clicked.connect(self.back)
-        self.con = sqlite3.connect("users.sqlite")
-        self.cur = self.con.cursor()
+        self.db_client = DBClient()
         self.namelabel.setText(name)
-        result = self.cur.execute("SELECT info FROM tems WHERE namelc = ?", (name.lower(),)).fetchone()
-        self.textBrowser.setText(result[0])
+        print(1234567)
+        result = self.db_client.execute_query("SELECT info FROM tems WHERE namelc = ?", (name.lower(),))
+        print(result[0][0])
+        self.textBrowser.setText(result[0][0])
 
 
     def back(self):
@@ -834,7 +889,8 @@ class ViewTem(QMainWindow):
 class AddTems(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setStyleSheet("#MainWindow{background-image: url('sup/bg.jpg'); no-repeat;}")
+        self.setStyleSheet(back)
+        self.db_client = DBClient()
         self.mainw()
 
     def mainw(self):
@@ -848,10 +904,8 @@ class AddTems(QMainWindow):
     def addtem(self):
         self.name = self.temname.text()
         self.info = self.temtext.toPlainText()
-        self.con = sqlite3.connect("users.sqlite")
-        self.cur = self.con.cursor()
-        self.cur.execute("INSERT INTO tems (name, info) VALUES (?, ?)", (self.name, self.info,))
-        self.con.commit()
+        result = self.db_client.execute_query("INSERT INTO tems (name, info, namelc) VALUES (?, ?, ?)",
+                                              (self.name, self.info, self.name.lower(),))
         self.hide()
 
     def back(self):
