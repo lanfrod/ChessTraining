@@ -22,7 +22,7 @@ import socket
 
 class DBClient:
     def __init__(self):
-        self.server_address = ('localhost', 8687)
+        self.server_address = ('ru.tuna.am', 29910)
         self.timeout = 0.2
 
     def execute_query(self, query, params=None):
@@ -30,12 +30,8 @@ class DBClient:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.settimeout(self.timeout)
                 s.connect(self.server_address)
-                # Формируем запрос
                 query_data = f"{query}|||{params}" if params else query
-                print(f"Отправка запроса: {query_data}")
                 s.sendall(query_data.encode('utf-8'))
-
-                # Получаем ответ
                 data = b""
                 while True:
                     try:
@@ -44,14 +40,10 @@ class DBClient:
                             break
                         data += chunk
                     except socket.timeout:
-                        print("Таймаут приема данных")
                         break
-
-                print(f"Получен ответ: {data}")
                 return eval(data.decode()) if data else None
 
         except Exception as e:
-            print(f"Ошибка соединения: {e}")
             return None
 
 
@@ -70,42 +62,13 @@ class Vxodtyt(QMainWindow):
         self.regbtn.clicked.connect(self.register)
 
     def wave(self):
-        #response = self.db_client.execute_query("PING")
-        #print(response)  # Должен получить "PONG"
-        #print(1)
-        #result = self.db_client.execute_query("SELECT 1")
-        #print(result)  # Должно вернуть [(1,)]
-        print(2)
-
         self.user_login = self.login.text()
         self.user_password = self.password.text()
-        # try:
-        #     print("Отправка запроса...")
-        #     result = self.db_client.execute_query(
-        #         'SELECT * FROM pass WHERE name = ? AND password = ?',
-        #         (self.user_login, self.user_password)
-        #     )
-        #     print(f"Результат: {result}")  # Логируем ответ
-        #
-        #     if result:
-        #         print("Успешная авторизация")
-        #         # ... ваш код ...
-        #     else:
-        #         print("Неверные данные")
-        #         self.lab.setText("Неверный логин или пароль")
-        #
-        # except Exception as e:
-        #     print(f"Ошибка в wave(): {e}")
-        #     self.lab.setText("Ошибка подключения к серверу")
         result = self.db_client.execute_query('SELECT * FROM pass WHERE name = ? AND password = ?',
                                               (self.user_login, self.user_password))
-        print(3)
-        print(result)
         if result != []:
             if result[0][0]:
-                print(4)
                 val = self.get_val()
-                print(val)
                 if val == 1:
                     self.studyyy = TeacherChooseMenu()
                     self.studyyy.show()
@@ -118,30 +81,20 @@ class Vxodtyt(QMainWindow):
                 self.lab.setText("Имя пользователя или пароль неверные")
         else:
             self.lab.setText("Имя пользователя или пароль неверные")
-        print(4)
 
 
     def get_val(self):
-        print("5: Начало get_val()")  # Логируем вход в функцию
-
         try:
-            # Получаем результат запроса
             result = self.db_client.execute_query(
                 'SELECT val FROM pass WHERE name = ? AND password = ?',
                 (self.user_login, self.user_password)
             )
-            print(f"6: Результат запроса: {result}")
-
             if not result:
-                print("7: Пользователь не найден")
                 return None
-
             val = result[0][0]
-            #print(f"8: Получено значение val: {val}")
             return val
 
         except Exception as e:
-            #print(f"Ошибка в get_val(): {e}")
             return None
 
     def register(self):
@@ -164,8 +117,8 @@ class Vxodtyt(QMainWindow):
         send = self.sender()
         if send.text() == "Как ученик":
             self.flag = 0
-        elif send.text() == "Как учитель":
-            self.flag = 1
+        # elif send.text() == "Как учитель": # На время тестов, чтобы не сломать уроки все
+        #     self.flag = 1
         uic.loadUi("ui/t3.ui", self)
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
@@ -179,12 +132,10 @@ class Vxodtyt(QMainWindow):
         self.login_reg = self.loginreg.text()
         self.password_reg = self.passreg.text()
         result = self.db_client.execute_query('SELECT name FROM pass WHERE name = ?', (self.login_reg,))
-        print(result)
         if not result:
             flag1 = True
         else:
             self.labeler.setText("Такой пользователь уже есть")
-        print(2313)
         if 7 < len(self.password_reg) < 17:
             flag2 = True
         for i in self.password_reg:
@@ -196,7 +147,6 @@ class Vxodtyt(QMainWindow):
                 flagup = True
             elif i == i.lower():
                 flagdo = True
-        print(2313231321)
         if flagup and flags and flag2 and flag1 and flagdo and n:
             result = self.db_client.execute_query("INSERT INTO 'pass' (name, password, val) VALUES (?, ?, ?)",
                                                   (self.login_reg, self.password_reg, self.flag))
@@ -220,13 +170,9 @@ class Choosemenu(QMainWindow):
         self.spravka.clicked.connect(self.SPR)
 
     def SPR(self):
-        print(2222)
         self.SPRA = Sprav()
-        print(2222)
         self.SPRA.show()
-        print(2222)
         self.hide()
-        print(2222)
 
     def LES(self):
         self.LESIK = Lessonsst()
@@ -260,6 +206,11 @@ class TeacherChooseMenu(Choosemenu):
         self.t.show()
         self.hide()
 
+    def SPR(self):
+        self.SPRA = Sprav_Teach()
+        self.SPRA.show()
+        self.hide()
+
 
 class Teach(QMainWindow):
     def __init__(self):
@@ -280,6 +231,7 @@ class Teach(QMainWindow):
         self.titles = None
         self.delbtn.clicked.connect(self.delete_elem)
         self.tableWidget.doubleClicked.connect(self.open_less_on_double_click)
+        self.update_result()
 
     def delete_elem(self):
         rows = list(set([i.row() for i in self.tableWidget.selectedItems()]))
@@ -290,17 +242,19 @@ class Teach(QMainWindow):
         if valid == QMessageBox.Yes:
             result = self.db_client.execute_query("DELETE FROM study_plans WHERE name = ?",
                                                    (self.tableWidget.currentItem().text(), ))
+            self.update_result()
 
     def open_less_on_double_click(self, index):
         """Вызывается при двойном клике на таблицу."""
         self.open_less()
 
     def open_less(self):
-        title = self.tableWidget.currentItem().text()
-        self.viewR = ViewLesson(title)
-        self.viewR.show()
-        self.le = Lessonsst()
-        self.le.hide()
+        if self.tableWidget.currentItem():
+            title = self.tableWidget.currentItem().text()
+            self.viewR = ViewLesson(title)
+            self.viewR.show()
+            self.le = Lessonsst()
+            self.le.hide()
 
     def update_result(self):
         self.wenty = self.lessline.text()
@@ -316,14 +270,9 @@ class Teach(QMainWindow):
         else:
             result = self.db_client.execute_query("SELECT name FROM study_plans")
         if result != []:
-            print(result)
+
             self.tableWidget.setRowCount(len(result))
-            print("qqq")
-            print(result[0])
             self.tableWidget.setColumnCount(len(result[0]))
-            print("rrr")
-            # self.titles = [description[0] for description in result.description]
-            print(123)
             for i, elem in enumerate(result):
                 for j, val in enumerate(elem):
                     self.tableWidget.setItem(i, j, QTableWidgetItem(str(val)))
@@ -443,17 +392,19 @@ class Lessonsst(QMainWindow):
         self.modified = {}
         self.titles = None
         self.tableWidget.doubleClicked.connect(self.open_less_on_double_click)
+        self.update_result()
 
     def open_less_on_double_click(self, index):
         """Вызывается при двойном клике на таблицу."""
         self.open_less()
 
     def open_less(self):
-        title = self.tableWidget.currentItem().text()
-        self.viewR = ViewLesson(title)
-        self.viewR.show()
-        self.le = Lessonsst()
-        self.le.hide()
+        if self.tableWidget.currentItem():
+            title = self.tableWidget.currentItem().text()
+            self.viewR = ViewLesson(title)
+            self.viewR.show()
+            self.le = Lessonsst()
+            self.le.hide()
 
     def update_result(self):
         self.wenty = self.lessline.text()
@@ -469,14 +420,8 @@ class Lessonsst(QMainWindow):
         else:
             result = self.db_client.execute_query("SELECT name FROM study_plans")
         if result != []:
-            print(result)
             self.tableWidget.setRowCount(len(result))
-            print("qqq")
-            print(result[0])
             self.tableWidget.setColumnCount(len(result[0]))
-            print("rrr")
-            # self.titles = [description[0] for description in result.description]
-            print(123)
             for i, elem in enumerate(result):
                 for j, val in enumerate(elem):
                     self.tableWidget.setItem(i, j, QTableWidgetItem(str(val)))
@@ -787,6 +732,7 @@ class Sprav(QMainWindow):
         self.db_client = DBClient()
         self.setStyleSheet(back)
         self.windowmain()
+        self.findtem()
 
     def windowmain(self):
         uic.loadUi("ui/spravo4ka.ui", self)
@@ -807,37 +753,27 @@ class Sprav(QMainWindow):
         self.open_temy()
 
     def open_temy(self):
-        print(2)
-        title = self.tableWidget.currentItem().text()
-        print(3)
-        self.viewR = ViewTem(title)
-        self.viewR.show()
-        self.le = Sprav()
-        self.le.hide()
+        if self.tableWidget.currentItem():
+            title = self.tableWidget.currentItem().text()
+            self.viewR = ViewTem(title)
+            self.viewR.show()
+            self.le = Sprav()
+            self.le.hide()
 
     def findtem(self):
         self.wenty = self.temline.text()
-        print(self.wenty)
         if self.wenty:
-            print("ab")
-            result = self.db_client.execute_query("SELECT * FROM tems WHERE name LIKE ?",
+            result = self.db_client.execute_query("SELECT name FROM tems WHERE name LIKE ?",
                                  (self.temline.text() + "%",))
         else:
-            print("ba")
-            result = self.db_client.execute_query("SELECT * FROM tems")
-
-        print(len(result))
+            result = self.db_client.execute_query("SELECT name FROM tems")
         self.tableWidget.setRowCount(len(result))
-        print(123)
         if not result:
-
             self.statusBar().showMessage('Ничего не нашлось')
             return
         else:
             self.statusBar().showMessage("")
-        print(123)
         self.tableWidget.setColumnCount(len(result[0]))
-        print(123)
         for i, elem in enumerate(result):
             for j, val in enumerate(elem):
                 self.tableWidget.setItem(i, j, QTableWidgetItem(str(val)))
@@ -848,6 +784,94 @@ class Sprav(QMainWindow):
         self.addtemwin.show()
         self.sprik = Sprav()
         self.sprik.hide()
+
+    def back(self):
+        if self.send.objectName() == 'spravka':
+            self.backStudy = Choosemenu()
+            self.backStudy.show()
+            self.hide()
+        elif self.send.objectName() == 'spravkat':
+            self.backteachstudy = TeacherChooseMenu()
+            self.backteachstudy.show()
+            self.hide()
+
+
+class Sprav_Teach(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.db_client = DBClient()
+        self.setStyleSheet(back)
+        self.windowmain()
+
+
+    def windowmain(self):
+        uic.loadUi("ui/spravo4ka_teach.ui", self)
+        self.setWindowTitle("ChessTraining")
+        self.setWindowIcon(QIcon('sup/logo.png'))
+        self.send = self.sender()
+        self.commandLinkButton.clicked.connect(self.back)
+        self.addtem.clicked.connect(self.addtems)
+        self.poisktem.clicked.connect(self.findtem)
+        self.db_client = DBClient()
+        self.modified = {}
+        self.titles = None
+        self.opentem.clicked.connect(self.open_temy)
+        self.deltem.clicked.connect(self.delete_elem)
+        self.tableWidget.doubleClicked.connect(self.open_less_on_double_click)
+        self.findtem()
+
+
+    def open_less_on_double_click(self, index):
+        """Вызывается при двойном клике на таблицу."""
+        self.open_temy()
+
+    def delete_elem(self):
+        rows = list(set([i.row() for i in self.tableWidget.selectedItems()]))
+        ids = [self.tableWidget.item(i, 0).text() for i in rows]
+        valid = QMessageBox.question(
+            self, '', "Действительно удалить элементы с id " + ",".join(ids),
+            QMessageBox.Yes, QMessageBox.No)
+        if valid == QMessageBox.Yes:
+            result = self.db_client.execute_query("DELETE FROM tems WHERE name = ?",
+                                                   (self.tableWidget.currentItem().text(), ))
+            self.findtem()
+
+    def open_temy(self):
+        if self.tableWidget.currentItem():
+            title = self.tableWidget.currentItem().text()
+            self.viewR = ViewTem(title)
+            self.viewR.show()
+            self.le = Sprav_Teach()
+            self.le.hide()
+
+    def findtem(self):
+        self.wenty = self.temline.text()
+        if self.wenty:
+            result = self.db_client.execute_query("SELECT name FROM tems WHERE name LIKE ?",
+                                 (self.temline.text() + "%",))
+        else:
+            result = self.db_client.execute_query("SELECT name FROM tems")
+        if result != []:
+            self.tableWidget.setRowCount(len(result))
+            self.tableWidget.setColumnCount(len(result[0]))
+            for i, elem in enumerate(result):
+                for j, val in enumerate(elem):
+                    self.tableWidget.setItem(i, j, QTableWidgetItem(str(val)))
+            self.modified = {}
+        else:
+            self.tableWidget.setRowCount(len(result))
+            self.tableWidget.setColumnCount(0)
+            for i, elem in enumerate(result):
+                for j, val in enumerate(elem):
+                    self.tableWidget.setItem(i, j, QTableWidgetItem(str(val)))
+            self.modified = {}
+
+    def addtems(self):
+        self.addtemwin = AddTems()
+        self.addtemwin.show()
+        self.sprik = Sprav()
+        self.sprik.hide()
+
 
     def back(self):
         if self.send.objectName() == 'spravka':
@@ -874,11 +898,8 @@ class ViewTem(QMainWindow):
         self.commandLinkButton.clicked.connect(self.back)
         self.db_client = DBClient()
         self.namelabel.setText(name)
-        print(1234567)
         result = self.db_client.execute_query("SELECT info FROM tems WHERE namelc = ?", (name.lower(),))
-        print(result[0][0])
         self.textBrowser.setText(result[0][0])
-
 
     def back(self):
         #  self.l = Lessonsst()
