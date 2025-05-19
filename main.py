@@ -1,4 +1,3 @@
-import sqlite3
 import sys
 from PyQt5 import QtCore
 from PIL import Image
@@ -22,8 +21,8 @@ import socket
 
 class DBClient:
     def __init__(self):
-        self.server_address = ('ru.tuna.am', 29910)
-        self.timeout = 0.2
+        self.server_address = ('ru.tuna.am', 23820)
+        self.timeout = 0.5
 
     def execute_query(self, query, params=None):
         try:
@@ -102,7 +101,7 @@ class Vxodtyt(QMainWindow):
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
         self.setStyleSheet(back)
-        self.asteach.clicked.connect(self.reguser)
+        #self.asteach.clicked.connect(self.reguser)
         self.asuser.clicked.connect(self.reguser)
         self.commandLinkButton2.clicked.connect(self.back)
 
@@ -117,8 +116,8 @@ class Vxodtyt(QMainWindow):
         send = self.sender()
         if send.text() == "Как ученик":
             self.flag = 0
-        # elif send.text() == "Как учитель": # На время тестов, чтобы не сломать уроки все
-        #     self.flag = 1
+       # elif send.text() == "Как учитель": # На время тестов, чтобы не сломать уроки все
+          #  self.flag = 1
         uic.loadUi("ui/t3.ui", self)
         self.setWindowTitle("ChessTraining")
         self.setWindowIcon(QIcon('sup/logo.png'))
