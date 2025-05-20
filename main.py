@@ -21,7 +21,7 @@ import socket
 
 class DBClient:
     def __init__(self):
-        self.server_address = ('ru.tuna.am', 23820)
+        self.server_address = ('ru.tuna.am', 27027)
         self.timeout = 0.5
 
     def execute_query(self, query, params=None):
